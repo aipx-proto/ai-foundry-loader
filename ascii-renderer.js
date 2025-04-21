@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(loadElements, 50);
         return;
       }
+      // copy options from https://promptcache.com/tools/ascii-art-generator
       const config = {
         mouseRadius: 87,
         intensity: 20,
@@ -21,12 +22,12 @@ document.addEventListener("DOMContentLoaded", function () {
         returnWhenStill: true,
         enableJiggle: false,
         jiggleIntensity: 0.1,
-        detailFactor: 30,
+        detailFactor: 40,
         contrast: 90,
         brightness: 105,
         saturation: 200,
         useTransparentBackground: false,
-        backgroundColor: "#000000"
+        backgroundColor: "transparent",
       };
       const charSet = " .:-=+*#%@";
       const colorScheme = (r, g, b, brightness, saturation) => {
