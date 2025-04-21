@@ -13,12 +13,12 @@ document.addEventListener("DOMContentLoaded", function () {
       // copy options from https://promptcache.com/tools/ascii-art-generator
       const config = {
         mouseRadius: 87,
-        intensity: 20,
-        fontSize: 12,
-        charSpacing: 0.6,
+        intensity: 50,
+        fontSize: 10,
+        charSpacing: 0.1,
         lineHeight: 1,
-        mousePersistence: 0.97,
-        returnSpeed: 0.37,
+        mousePersistence: 0.6,
+        returnSpeed: 0.4,
         returnWhenStill: true,
         enableJiggle: false,
         jiggleIntensity: 0.1,
