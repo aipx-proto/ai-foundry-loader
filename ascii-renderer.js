@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
       // copy options from https://promptcache.com/tools/ascii-art-generator
-      const config = {
+      const configDefault = {
         mouseRadius: 87,
         intensity: 50,
         fontSize: 10,
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
         lineHeight: 1,
         mousePersistence: 0.6,
         returnSpeed: 0.4,
-        returnWhenStill: true,
+        returnWhenStill: false,
         enableJiggle: false,
         jiggleIntensity: 0.1,
         detailFactor: 40,
@@ -29,6 +29,20 @@ document.addEventListener("DOMContentLoaded", function () {
         useTransparentBackground: false,
         backgroundColor: "transparent",
       };
+      const configClick = {
+        ...configDefault,
+        mouseRadius: 40,
+        intensity: 200,
+        mousePersistence: 0.8,
+        returnSpeed: 0.01,
+      };
+      let config = configDefault;
+      container.addEventListener("mousedown", function (e) {
+        config = configClick;
+      })
+      container.addEventListener("mouseup", function (e) {
+        config = configDefault;
+      })
       const charSet = " .:-=+*#%@";
       const colorScheme = (r, g, b, brightness, saturation) => {
         const sat = saturation / 100;
