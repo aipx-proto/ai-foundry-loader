@@ -17,6 +17,8 @@
       background-color: #000;
       color: white;
       font-family: monospace;
+      position: relative;
+      color-scheme: dark;
     }
 
     body {
@@ -33,6 +35,19 @@
       width: 100%;
       height: 100%;
       height: 400px;
+    }
+
+    #links{
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin: 1em;
+      opacity: 0.3;
+      transition: opacity 0.1s ease-in-out;
+      background-color: transparent;
+      &:hover {
+        opacity: 1;
+      }
     }
 
     #loading-spinner {
@@ -69,6 +84,12 @@
   <div style="display:flex; align-items: center; justify-content: center; gap:1em;">
     <div id="loading-spinner"></div>
     <div>Deploying model</div>
+  </div>
+
+  <div id="links">
+    <a href='https://github.com/aipx-proto/ai-foundry-loader' target='_blank'>Github</a>
+    /
+    <a href='https://promptcache.com/tools/ascii-art-generator' target='_blank'>Ascii Tool</a>
   </div>
 
 </body>
