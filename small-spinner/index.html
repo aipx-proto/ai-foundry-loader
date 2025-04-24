@@ -34,7 +34,10 @@
       align-items: center;
       width: 100%;
       height: 100%;
-      height: 150px;
+      height: 50px;
+      margin: 8px;
+      padding: 8px;
+      
     }
 
     #links {
@@ -63,11 +66,11 @@
 
     @keyframes spin {
       0% {
-        transform: translateZ(0) rotate(0deg);
+        transform: rotate(45deg);
       }
 
       100% {
-        transform: translateZ(0) rotate(360deg);
+        transform: rotate(405deg);
       }
     }
   </style>
@@ -77,7 +80,7 @@
 
   <div id="ascii-parent">
     <canvas id="ascii-canvas-1745265792403" style="display: block; max-width: 100%; max-height: 100%;"></canvas>
-    <video id="source-video-1745265792403" src="./ai-foundary-liquid-logo.mp4" style="display: none;" loop muted
+    <video id="source-video-1745265792403" src="./spinner-liquid.mp4" style="display: none;" loop muted
       crossorigin="anonymous"></video>
     <script src="./ascii-renderer.js"></script>
   </div>
