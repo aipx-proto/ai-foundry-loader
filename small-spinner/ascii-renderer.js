@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       // copy options from https://promptcache.com/tools/ascii-art-generator
       const configDefault = {
-        mouseRadius: 40,
+        mouseRadius: 10,
         intensity: 50,
         fontSize: 10,
         charSpacing: 0.1,
@@ -36,6 +36,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // mousePersistence: 0.8,
         // returnSpeed: 0.01,
       };
+      configDefault.useTransparentBackground = false;
+      configClick.useTransparentBackground = false;
       let config = configDefault;
       container.addEventListener("mousedown", function (e) {
         config = configClick;
@@ -43,6 +45,13 @@ document.addEventListener("DOMContentLoaded", function () {
       container.addEventListener("mouseup", function (e) {
         config = configDefault;
       })
+      // Listen for background color change events
+      window.addEventListener('ascii-set-bgcolor', function(e) {
+        if (e && e.detail && e.detail.color) {
+          configDefault.backgroundColor = e.detail.color;
+          configClick.backgroundColor = e.detail.color;
+        }
+      });
       const charSet = " .:-=+*#%@";
       const colorScheme = (r, g, b, brightness, saturation) => {
         const sat = saturation / 100;

@@ -93,6 +93,25 @@
     <a href='https://promptcache.com/tools/ascii-art-generator' target='_blank'>Ascii Tool</a>
   </div>
 
+
+  <div id="mode-toggle" style="position: absolute; top: 1em; right: 6em; cursor: pointer;">
+    <button onclick="toggleMode()">Toggle Light/Dark</button>
+  </div>
+
+  <script>
+    function toggleMode() {
+      const body = document.body;
+      const isDark = body.classList.toggle('light-mode');
+      if (isDark) {
+        body.style.backgroundColor = '#fff';
+        body.style.color = '#000';
+      } else {
+        body.style.backgroundColor = '#000';
+        body.style.color = '#fff';
+      }
+    }
+  </script>
+  
 </body>
 
 </html>
