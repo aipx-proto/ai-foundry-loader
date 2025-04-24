@@ -98,26 +98,15 @@
   </div>
 
   <script>
-    function toggleAnimationColors(forceInvert) {
-      const spinner = document.getElementById('loading-spinner');
-      if (forceInvert) {
-        spinner.style.filter = 'invert(1)';
-      } else {
-        spinner.style.filter = '';
-      }
-    }
-
     function toggleMode() {
       const body = document.body;
       const isDark = body.classList.toggle('light-mode');
       if (isDark) {
         body.style.backgroundColor = '#fff';
         body.style.color = '#000';
-        toggleAnimationColors(true);
       } else {
         body.style.backgroundColor = '#000';
         body.style.color = '#fff';
-        toggleAnimationColors(false);
       }
     }
   </script>
