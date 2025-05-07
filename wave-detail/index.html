@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liquid Logo</title>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+      color: white;
+      font-family: monospace;
+      position: relative;
+      color-scheme: dark;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    #ascii-parent {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      width: 100vw;
+      height: 150px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="ascii-parent">
+    <canvas id="ascii-canvas-1745265792403" style="display: block; max-width: 100%; max-height: 100%;"></canvas>
+    <video id="source-video-1745265792403" src="./grey-waves.mp4" style="display: none;" loop muted
+      crossorigin="anonymous"></video>
+    <script src="./ascii-renderer.js"></script>
+  </div>
+
+</body>
+
+</html>
