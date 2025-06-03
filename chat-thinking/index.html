@@ -188,14 +188,14 @@
       setLine(lines.next, to);
       lines.cur.style.transform = 'translateY(0)';
       lines.cur.style.opacity = 1;
-      lines.next.style.transform = 'translateY(8px)';
+      lines.next.style.transform = 'translateY(16px)'; // Start next line below
       lines.next.style.opacity = 0;
 
       // allow layout then animate
       requestAnimationFrame(() => {
-        lines.cur.style.transform = 'translateY(-16px)';
+        lines.cur.style.transform = 'translateY(-16px)'; // Move current line up and fade out
         lines.cur.style.opacity = 0;
-        lines.next.style.transform = 'translateY(0)';
+        lines.next.style.transform = 'translateY(0)';    // Move next line to center and fade in
         lines.next.style.opacity = 1;
       });
 
@@ -216,7 +216,7 @@
     setLine(lines.cur, statusMessages[statusIndex]);
     setLine(lines.next, statusMessages[(statusIndex + 1) % statusMessages.length]);
     lines.next.style.opacity = 0;
-    lines.next.style.transform = 'translateY(8px)';
+    lines.next.style.transform = 'translateY(16px)'; // Start next line below
 
     // Cycle status every 5s
     timer = setInterval(pushStatus, 5000);
