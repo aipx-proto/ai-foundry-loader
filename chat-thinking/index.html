@@ -73,8 +73,6 @@
 
   <div id="ascii-parent">
     <canvas id="ascii-canvas-1745265792403" style="display: block; max-width: 100%; max-height: 100%;"></canvas>
-    <video id="source-video-1745265792403" src="./spinner-liquid-dark.mp4" style="display: none;" loop muted
-      crossorigin="anonymous"></video>
     <script src="./ascii-renderer.js"></script>
     <div id="wave-text">
       <div class="line current"></div>
@@ -95,21 +93,16 @@
   <script>
     function toggleMode() {
       const body = document.body;
-      const video = document.getElementById('source-video-1745265792403');
       const isLight = body.classList.toggle('light-mode');
       if (isLight) {
         body.style.backgroundColor = '#fff';
         body.style.color = '#000';
-        video.src = './spinner-liquid-light.mp4';
         window.dispatchEvent(new CustomEvent('ascii-set-bgcolor', { detail: { color: '#fff' } }));
       } else {
         body.style.backgroundColor = '#000';
         body.style.color = '#fff';
-        video.src = './spinner-liquid-dark.mp4';
         window.dispatchEvent(new CustomEvent('ascii-set-bgcolor', { detail: { color: '#000' } }));
       }
-      video.load();
-      video.play();
     }
 
     // List of status messages and their icons to cycle through
