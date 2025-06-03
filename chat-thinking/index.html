@@ -53,8 +53,18 @@
     }
 
     #wave-text {
+      position: relative;
       display: inline-block;
-      white-space: nowrap;
+      min-width: 320px;
+      padding-right: 16px;
+    }
+
+    #wave-text .line {
+      position: absolute;
+      left: 0;
+      will-change: transform, opacity;
+      transition: transform .4s cubic-bezier(.22,.61,.36,1),
+                  opacity   .4s cubic-bezier(.22,.61,.36,1);
     }
   </style>
 </head>
@@ -66,7 +76,10 @@
     <video id="source-video-1745265792403" src="./spinner-liquid-dark.mp4" style="display: none;" loop muted
       crossorigin="anonymous"></video>
     <script src="./ascii-renderer.js"></script>
-    <div id="wave-text">Thinking</div>
+    <div id="wave-text">
+      <div class="line current"></div>
+      <div class="line next"></div>
+    </div>
   </div>
 
   <div id="links">
@@ -125,65 +138,95 @@
     waveText.style.transition = 'opacity 0.4s';
     waveText.style.opacity = 1;
 
-    // Switch status message every 5 seconds, with a 1 second pause before looping to the first
-    function cycleStatus() {
-      if (statusIndex < statusMessages.length - 1) {
-        // Fade out
-        waveText.style.opacity = 0;
-        setTimeout(() => {
-          statusIndex++;
-          text = statusMessages[statusIndex].text;
-          icon = statusMessages[statusIndex].icon;
-          waveText.style.opacity = 1;
-          setTimeout(cycleStatus, 5000);
-        }, 400);
-      } else {
-        // Fade out and hide the text for 1 second
-        waveText.style.opacity = 0;
-        setTimeout(() => {
-          waveText.style.visibility = 'hidden';
-          setTimeout(() => {
-            statusIndex = 0;
-            text = statusMessages[statusIndex].text;
-            icon = statusMessages[statusIndex].icon;
-            waveText.style.visibility = 'visible';
-            waveText.style.opacity = 1;
-            setTimeout(cycleStatus, 5000);
-          }, 1000);
-        }, 400);
-      }
-    }
-    setTimeout(cycleStatus, 5000);
+    // Add a container for two lines of wave text
+    waveText.style.display = 'block';
+    let prevText = '';
+    let prevIcon = '';
+    let isTransitioning = false;
 
-    function renderWaveText() {
-      // Slow the wave down by increasing the divisor (e.g., from 150 to 300)
-      const time = Date.now() / 150;
-      const phaseStep = 0.3;
-      const yWaveArr = Array.from(text).map((char, i) => {
-        const phase = i * phaseStep;
-        const wave = Math.sin(time - phase);
-        const y = -Math.max(0, wave * 2.5);
-        return { y, wave, i, char };
-      });
-      const maxY = Math.min(...yWaveArr.map(obj => obj.y));
-      const apexIdx = yWaveArr.findIndex(obj => obj.y === maxY);
-      // Add icon at the front, not animated
-      let iconSpan = `<span style='display:inline-block; margin-right: 0.5em; font-size: 1.1em; vertical-align: middle; padding-bottom: 6px;'>${icon}</span>`;
-      waveText.innerHTML = iconSpan + yWaveArr.map((obj, idx) => {
-        const displayChar = obj.char === ' ' ? '&nbsp;' : obj.char;
-        const scale = 1 + Math.max(0, obj.wave) * 0.12;
-        let shimmer = '';
-        if (idx === apexIdx && obj.char !== ' ') {
-          const shimmerPos = 50 + Math.sin(time * 1.5) * 30;
-          shimmer = `background: linear-gradient(120deg, #fff 10%, #b0c4de ${shimmerPos}%, #fff 90%);`
-                  + 'background-clip: text; -webkit-background-clip: text; color: transparent;'
-                  + 'filter: brightness(2) drop-shadow(0 0 3px #fff);';
-        }
-        return `<span style="display:inline-block; transform: translateY(${obj.y}px) scale(${scale});${shimmer}">${displayChar}</span>`;
-      }).join('');
+    const lines = {
+      cur: document.querySelector('#wave-text .current'),
+      next: document.querySelector('#wave-text .next')
+    };
+
+    function setLine(el, { icon, text }) {
+      // Animate the wave using requestAnimationFrame
+      if (el._waveAnim) cancelAnimationFrame(el._waveAnim);
+      function renderWave() {
+        const time = Date.now() / 150;
+        const phaseStep = 0.3;
+        const yWaveArr = Array.from(text).map((char, i) => {
+          const phase = i * phaseStep;
+          const wave = Math.sin(time - phase);
+          const y = -Math.max(0, wave * 2.5);
+          return { y, wave, i, char };
+        });
+        const maxY = Math.min(...yWaveArr.map(obj => obj.y));
+        const apexIdx = yWaveArr.findIndex(obj => obj.y === maxY);
+        let iconSpan = `<span style='display:inline-block; margin-right: 0.5em; font-size: 1.1em; vertical-align: middle; padding-bottom: 6px;'>${icon}</span>`;
+        el.innerHTML =
+          iconSpan +
+          yWaveArr
+            .map((obj, idx) => {
+              const displayChar = obj.char === ' ' ? '&nbsp;' : obj.char;
+              const scale = 1 + Math.max(0, obj.wave) * 0.12;
+              let shimmer = '';
+              if (idx === apexIdx && obj.char !== ' ') {
+                const shimmerPos = 50 + Math.sin(time * 1.5) * 30;
+                shimmer = `background: linear-gradient(120deg, #fff 10%, #b0c4de ${shimmerPos}%, #fff 90%);` +
+                  'background-clip: text; -webkit-background-clip: text; color: transparent;' +
+                  'filter: brightness(2) drop-shadow(0 0 3px #fff);';
+              }
+              return `<span style="display:inline-block; transform: translateY(${obj.y}px) scale(${scale});${shimmer}">${displayChar}</span>`;
+            })
+            .join('');
+        el._waveAnim = requestAnimationFrame(renderWave);
+      }
+      renderWave();
     }
-    // Smoother animation: lower interval
-    setInterval(renderWaveText, 16);
+
+    function pushStatus() {
+      if (statusIndex >= statusMessages.length - 1) {
+        statusIndex = 0;
+      }
+      const from = statusMessages[statusIndex++];
+      const to = statusMessages[statusIndex];
+
+      setLine(lines.next, to);
+      lines.cur.style.transform = 'translateY(0)';
+      lines.cur.style.opacity = 1;
+      lines.next.style.transform = 'translateY(8px)';
+      lines.next.style.opacity = 0;
+
+      // allow layout then animate
+      requestAnimationFrame(() => {
+        lines.cur.style.transform = 'translateY(-16px)';
+        lines.cur.style.opacity = 0;
+        lines.next.style.transform = 'translateY(0)';
+        lines.next.style.opacity = 1;
+      });
+
+      // swap references after the transition ends
+      setTimeout(() => {
+        const tmp = lines.cur;
+        lines.cur = lines.next;
+        lines.next = tmp;
+        // move .current/.next classes
+        lines.cur.classList.add('current');
+        lines.cur.classList.remove('next');
+        lines.next.classList.add('next');
+        lines.next.classList.remove('current');
+      }, 400);
+    }
+
+    // Initial render
+    setLine(lines.cur, statusMessages[statusIndex]);
+    setLine(lines.next, statusMessages[(statusIndex + 1) % statusMessages.length]);
+    lines.next.style.opacity = 0;
+    lines.next.style.transform = 'translateY(8px)';
+
+    // Cycle status every 5s
+    timer = setInterval(pushStatus, 5000);
   </script>
 
 </body>
