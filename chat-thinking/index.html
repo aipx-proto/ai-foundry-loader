@@ -66,6 +66,20 @@
       transition: transform .4s cubic-bezier(.22,.61,.36,1),
                   opacity   .4s cubic-bezier(.22,.61,.36,1);
     }
+
+    body.light-mode {
+      background-color: #fff !important;
+      color: #000 !important;
+    }
+
+    body.light-mode #wave-text .line span {
+      /* Ensure shimmer and text are visible in light mode */
+      filter: none !important;
+      color: #000 !important;
+      background: none !important;
+      -webkit-background-clip: initial !important;
+      background-clip: initial !important;
+    }
   </style>
 </head>
 
@@ -178,6 +192,14 @@
       renderWave();
     }
 
+    // Initial render
+    setLine(lines.cur, statusMessages[statusIndex]);
+    setLine(lines.next, statusMessages[(statusIndex + 1) % statusMessages.length]);
+    lines.cur.style.opacity = 1;
+    lines.cur.style.transform = 'translateY(0)';
+    lines.next.style.opacity = 0;
+    lines.next.style.transform = 'translateY(16px)'; // Always start next line below
+
     function pushStatus() {
       if (statusIndex >= statusMessages.length - 1) {
         statusIndex = 0;
@@ -186,37 +208,37 @@
       const to = statusMessages[statusIndex];
 
       setLine(lines.next, to);
+      // Always: next line comes from below, current line moves up
+      lines.cur.style.transition = 'none';
+      lines.next.style.transition = 'none';
       lines.cur.style.transform = 'translateY(0)';
       lines.cur.style.opacity = 1;
-      lines.next.style.transform = 'translateY(16px)'; // Start next line below
+      lines.next.style.transform = 'translateY(16px)';
       lines.next.style.opacity = 0;
 
-      // allow layout then animate
+      // Force reflow to apply the initial state before animating
+      void lines.cur.offsetWidth;
+      void lines.next.offsetWidth;
+      lines.cur.style.transition = '';
+      lines.next.style.transition = '';
+
       requestAnimationFrame(() => {
-        lines.cur.style.transform = 'translateY(-16px)'; // Move current line up and fade out
+        lines.cur.style.transform = 'translateY(-16px)';
         lines.cur.style.opacity = 0;
-        lines.next.style.transform = 'translateY(0)';    // Move next line to center and fade in
+        lines.next.style.transform = 'translateY(0)';
         lines.next.style.opacity = 1;
       });
 
-      // swap references after the transition ends
       setTimeout(() => {
         const tmp = lines.cur;
         lines.cur = lines.next;
         lines.next = tmp;
-        // move .current/.next classes
         lines.cur.classList.add('current');
         lines.cur.classList.remove('next');
         lines.next.classList.add('next');
         lines.next.classList.remove('current');
       }, 400);
     }
-
-    // Initial render
-    setLine(lines.cur, statusMessages[statusIndex]);
-    setLine(lines.next, statusMessages[(statusIndex + 1) % statusMessages.length]);
-    lines.next.style.opacity = 0;
-    lines.next.style.transform = 'translateY(16px)'; // Start next line below
 
     // Cycle status every 5s
     timer = setInterval(pushStatus, 5000);
