@@ -99,42 +99,70 @@
       video.play();
     }
 
-    // List of status messages to cycle through
+    // List of status messages and their icons to cycle through
     const statusMessages = [
-      "Thinking",
-      "Getting data",
-      "Calling tools",
-      "Analyzing input",
-      "Generating response",
-      "Contacting server",
-      "Processing request",
-      "Synthesizing answer",
-      "Retrieving info",
-      "Finalizing output"
+      { icon: '💭', text: 'Thinking' },
+      { icon: '📊', text: 'Getting data' },
+      { icon: '🛠️', text: 'Calling tools' },
+      { icon: '🔎', text: 'Analyzing input' },
+      { icon: '🤖', text: 'Generating response' },
+      { icon: '🌐', text: 'Contacting server' },
+      { icon: '⏳', text: 'Processing request' },
+      { icon: '🧠', text: 'Synthesizing answer' },
+      { icon: '📂', text: 'Retrieving info' },
+      { icon: '✅', text: 'Finalizing output' }
     ];
     let statusIndex = 0;
     const waveText = document.getElementById('wave-text');
-    let text = statusMessages[statusIndex];
+    let text = statusMessages[statusIndex].text;
+    let icon = statusMessages[statusIndex].icon;
 
-    // Switch status message every 5 seconds
-    setInterval(() => {
-      statusIndex = (statusIndex + 1) % statusMessages.length;
-      text = statusMessages[statusIndex];
-    }, 5000);
+    // Switch status message every 5 seconds, with a 1 second pause before looping to the first
+    function cycleStatus() {
+      if (statusIndex < statusMessages.length - 1) {
+        statusIndex++;
+        text = statusMessages[statusIndex].text;
+        icon = statusMessages[statusIndex].icon;
+        setTimeout(cycleStatus, 5000);
+      } else {
+        // Hide the text for 1 second
+        waveText.style.visibility = 'hidden';
+        setTimeout(() => {
+          statusIndex = 0;
+          text = statusMessages[statusIndex].text;
+          icon = statusMessages[statusIndex].icon;
+          waveText.style.visibility = 'visible';
+          setTimeout(cycleStatus, 5000);
+        }, 1000);
+      }
+    }
+    setTimeout(cycleStatus, 5000);
 
     function renderWaveText() {
-      // To make the wave faster or slower, edit the divisor below (smaller = faster, larger = slower):
-      // Example: const time = Date.now() / 600;
-      const time = Date.now() / 150; // <-- Edit this value for wave speed
-      waveText.innerHTML = Array.from(text).map((char, i) => {
-        // Preserve spaces as non-breaking spaces so they don't collapse
-        const displayChar = char === ' ' ? '&nbsp;' : char;
-        const phase = i * 0.35; // smaller step for smoother wave
+      // Slow the wave down by increasing the divisor (e.g., from 150 to 300)
+      const time = Date.now() / 150;
+      const phaseStep = 0.3;
+      const yWaveArr = Array.from(text).map((char, i) => {
+        const phase = i * phaseStep;
         const wave = Math.sin(time - phase);
-        const y = -Math.max(0, wave * 2.5); // lower amplitude for smoothness
-        // Slightly increase size as it lifts (scale from 1 to 1.12)
-        const scale = 1 + Math.max(0, wave) * 0.12;
-        return `<span style="display:inline-block; transform: translateY(${y}px) scale(${scale});">${displayChar}</span>`;
+        const y = -Math.max(0, wave * 2.5);
+        return { y, wave, i, char };
+      });
+      const maxY = Math.min(...yWaveArr.map(obj => obj.y));
+      const apexIdx = yWaveArr.findIndex(obj => obj.y === maxY);
+      // Add icon at the front, not animated
+      let iconSpan = `<span style='display:inline-block; margin-right: 0.5em; font-size: 1.1em; vertical-align: middle; padding-bottom: 6px;'>${icon}</span>`;
+      waveText.innerHTML = iconSpan + yWaveArr.map((obj, idx) => {
+        const displayChar = obj.char === ' ' ? '&nbsp;' : obj.char;
+        const scale = 1 + Math.max(0, obj.wave) * 0.12;
+        let shimmer = '';
+        if (idx === apexIdx && obj.char !== ' ') {
+          const shimmerPos = 50 + Math.sin(time * 1.5) * 30;
+          shimmer = `background: linear-gradient(120deg, #fff 10%, #b0c4de ${shimmerPos}%, #fff 90%);`
+                  + 'background-clip: text; -webkit-background-clip: text; color: transparent;'
+                  + 'filter: brightness(2) drop-shadow(0 0 3px #fff);';
+        }
+        return `<span style="display:inline-block; transform: translateY(${obj.y}px) scale(${scale});${shimmer}">${displayChar}</span>`;
       }).join('');
     }
     // Smoother animation: lower interval
