@@ -117,23 +117,40 @@
     let text = statusMessages[statusIndex].text;
     let icon = statusMessages[statusIndex].icon;
 
+    // Set left alignment for the wave text and parent
+    document.getElementById('ascii-parent').style.justifyContent = 'flex-start';
+    document.getElementById('ascii-parent').style.alignItems = 'flex-end';
+    waveText.style.textAlign = 'left';
+    waveText.style.width = 'fit-content';
+    waveText.style.transition = 'opacity 0.4s';
+    waveText.style.opacity = 1;
+
     // Switch status message every 5 seconds, with a 1 second pause before looping to the first
     function cycleStatus() {
       if (statusIndex < statusMessages.length - 1) {
-        statusIndex++;
-        text = statusMessages[statusIndex].text;
-        icon = statusMessages[statusIndex].icon;
-        setTimeout(cycleStatus, 5000);
-      } else {
-        // Hide the text for 1 second
-        waveText.style.visibility = 'hidden';
+        // Fade out
+        waveText.style.opacity = 0;
         setTimeout(() => {
-          statusIndex = 0;
+          statusIndex++;
           text = statusMessages[statusIndex].text;
           icon = statusMessages[statusIndex].icon;
-          waveText.style.visibility = 'visible';
+          waveText.style.opacity = 1;
           setTimeout(cycleStatus, 5000);
-        }, 1000);
+        }, 400);
+      } else {
+        // Fade out and hide the text for 1 second
+        waveText.style.opacity = 0;
+        setTimeout(() => {
+          waveText.style.visibility = 'hidden';
+          setTimeout(() => {
+            statusIndex = 0;
+            text = statusMessages[statusIndex].text;
+            icon = statusMessages[statusIndex].icon;
+            waveText.style.visibility = 'visible';
+            waveText.style.opacity = 1;
+            setTimeout(cycleStatus, 5000);
+          }, 1000);
+        }, 400);
       }
     }
     setTimeout(cycleStatus, 5000);
